@@ -17,3 +17,11 @@ fm_wind: 500   # (Kb) Window around the index on which to perform credible set a
 
 # Credible set analysis
 pp_threshold: 0.001 # Keep any variant which is in ((95% OR 99% credible set) AND post_posterior > pp_threshold)
+
+# Input locations
+gwas_files: '/finemapping/input/gwas'
+mol_trait_files: '/finemapping/input/molecular_trait/'
+linkage_disequilibrium_reference: '/finemapping/input/ukbb/ukb_v3_chr{chrom}.downsampled10k' # With chrom separating the files on chromosome
+
+# Output locations
+finemapping_output_dir: '/finemapping/output'

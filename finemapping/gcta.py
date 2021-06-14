@@ -51,8 +51,12 @@ def get_conditional_top_loci(sumstats, in_plink, temp_dir,
     # Log error if GCTA return code is not 0
     if cp.returncode != 0:
         gcta_log_file = '{0}.log'.format(gcta_out)
-        gcta_error = read_error_from_gcta_log(gcta_log_file)
-        logger.error('GCTA error:\n\n{0}\n'.format(gcta_error))
+        if os.path.isfile(gcta_log_file):
+            gcta_error = read_error_from_gcta_log(gcta_log_file)
+            logger.error('GCTA error:\n\n{0}\n'.format(gcta_error))
+        else:
+            logger.error('GCTA error occurred but no further details are ' \
+                         'available because log file was not found.')
 
     # Read results (if they exist)
     gcta_res = '{0}.jma.cojo'.format(gcta_out)

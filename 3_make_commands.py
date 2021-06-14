@@ -7,18 +7,24 @@
 #
 
 import os
-import sys
 import json
 import argparse
 import gzip
+import yaml
+
 
 def main():
+    # Load analysis config file
+    config_file = 'configs/analysis.config.yaml'
+    with open(config_file, 'r') as in_h:
+        config_dict = yaml.safe_load(in_h)
 
     # Args
     args = parse_args()
     in_manifest = 'configs/manifest.json.gz'
-    out_todo = 'commands_todo.txt.gz'
-    out_done = 'commands_done.txt.gz'
+
+    out_todo = os.path.join(config_dict['finemapping_output_dir'], 'commands_todo.txt.gz')
+    out_done = os.path.join(config_dict['finemapping_output_dir'], 'commands_done.txt.gz')
 
     # Pipeline args
     script = 'finemapping/single_study.wrapper.py'

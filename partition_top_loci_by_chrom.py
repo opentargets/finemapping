@@ -11,12 +11,17 @@ import sys
 import gzip
 import json
 import os
+import yaml
 
 def main():
+    # Load analysis config file
+    config_file = 'configs/analysis.config.yaml'
+    with open(config_file, 'r') as in_h:
+        config_dict = yaml.safe_load(in_h)
 
     # Args
-    in_file = '/home/ubuntu/results/finemapping/results/top_loci.json.gz'
-    out_dir = '/home/ubuntu/results/finemapping/results/top_loci_by_chrom'
+    in_file = os.path.join(config_dict['finemapping_output_dir'], 'results/top_loci.json.gz')
+    out_dir = os.path.join(config_dict['finemapping_output_dir'], 'results/top_loci_by_chrom')
 
     # Make outdir
     os.makedirs(out_dir, exist_ok=False)

@@ -4,18 +4,22 @@
 # Ed Mountjoy
 #
 
+import gzip
 import json
 import os
-from pprint import pprint
-import pandas as pd
-from numpy import nan
 from glob import glob
-import gzip
+
+import yaml
+
 
 def main():
+    # Load analysis config file
+    config_file = 'configs/analysis.config.yaml'
+    with open(config_file, 'r') as in_h:
+        config_dict = yaml.safe_load(in_h)
 
     # Args
-    input_pattern = '/home/ubuntu/results/finemapping/tmp/filtered_input/*.json.gz'
+    input_pattern = os.path.join(config_dict['finemapping_output_dir'], 'tmp/filtered_input/*.json.gz')
     out_json = 'configs/manifest.json.gz'
     valid_chrom = set([str(chrom) for chrom in range(1, 23)])
     method = 'conditional'
@@ -25,13 +29,25 @@ def main():
     # log_path = '/Users/em21/Projects/genetics-finemapping/logs/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}'
     # tmp_path = '/Users/em21/Projects/genetics-finemapping/tmp/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}'
     # ld_ref = '/Users/em21/Projects/reference_data/uk10k_2019Feb/3_liftover_to_GRCh38/output/{chrom}.ALSPAC_TWINSUK.maf01.beagle.csq.shapeit.20131101'
-    
+
     # Path patterns (server)
-    out_path = '/home/ubuntu/results/finemapping/output/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}'
-    log_path = '/home/ubuntu/results/finemapping/logs/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}'
-    tmp_path = '/home/ubuntu/results/finemapping/tmp/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}'
-    ld_ref = '/home/ubuntu/data/genotypes/ukb_v3_downsampled10k_plink/ukb_v3_chr{chrom}.downsampled10k'
-    
+    out_path = os.path.join(config_dict['finemapping_output_dir'],
+                            'output/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}')
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
+
+    log_path = os.path.join(config_dict['finemapping_output_dir'],
+                            'logs/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}')
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+
+    tmp_path = os.path.join(config_dict['finemapping_output_dir'],
+                            'tmp/study_id={0}/phenotype_id={1}/bio_feature={2}/chrom={3}')
+    if not os.path.exists(tmp_path):
+        os.makedirs(tmp_path)
+
+    ld_ref = config_dict['linkage_disequilibrium_reference']
+
     # Create manifest
     manifest = []
     for in_record in read_json_records(input_pattern):
@@ -85,6 +101,7 @@ def main():
 
     return 0
 
+
 def read_json_records(in_pattern):
     ''' Globs json inputs then yields all records as dicts.
         Expects inputs to be gzipped.
@@ -94,6 +111,7 @@ def read_json_records(in_pattern):
             for in_record in in_h:
                 in_record = json.loads(in_record.decode().rstrip())
                 yield in_record
+
 
 def parse_input_name(s):
     ''' Parses the required input name. Spark's input_file_name() returns the
@@ -105,6 +123,6 @@ def parse_input_name(s):
     out_s = out_s.replace('file://', '')
     return out_s
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     main()
